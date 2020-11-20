@@ -6,10 +6,12 @@
             <div class="spacer"></div>
             <div class="Toolbox">
                 {% if einstellungen.Lagekarten %}
-                <a target="_blank" href="{% url 'doku:lagekarte' einsatz.Nummer %}"><button>Lagekarten</button></a>
+                <a target="_blank" href="{% url 'lagekarte:lagekarte' einsatz.Nummer %}"><button>Lagekarten</button></a>
                 {% endif %}
-                <a href="{% url 'doku:oel' einsatz.Nummer %}"><button>ÖEL</button></a>
+                <a href="{% url 'oel:oel' einsatz.Nummer %}"><button>ÖEL</button></a>
+                {% if einstellungen.Hydranten %}
                 <a target="_blank" href="{{ einstellungen.Hydranten }}"><button>Hydranten</button></a>
+                {%  endif %}
                 <a target="_blank" href="https://www.dgg.bam.de/quickinfo/de/"><button>Gefahrgut</button></a>
                 <!--<a target="_blank" href=""><button>FeuerOn Infos</button></a>-->
             </div>

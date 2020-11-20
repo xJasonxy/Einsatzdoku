@@ -36,6 +36,8 @@ LOGOUT_REDIRECT_URL = '/doku/Benutzer/login'
 
 INSTALLED_APPS = [
     'doku.apps.DokuConfig',
+    'oel.apps.OelConfig',
+    'lagekarte.apps.LagekarteConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

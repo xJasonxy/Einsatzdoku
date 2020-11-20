@@ -20,6 +20,8 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     #path('', include('doku.urls')),
-    path('doku/', include('doku.urls')),   
+    path('doku/', include('doku.urls', namespace="doku")),
+    path('oel/', include('oel.urls', namespace="lagekarte")),
+    path('lagekarte/', include('lagekarte.urls', namespace="oel")),
     path('admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
