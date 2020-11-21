@@ -265,7 +265,7 @@ form {
 	width: 100%;
 	padding-bottom: 25px;
 }
-input, select {
+input, select, textarea {
 	border: none;
 	border-bottom: 1px solid var(--text-inverse-color);
 	display: block;
@@ -297,6 +297,10 @@ input[type=submit]:hover {
 }
 input {
     line-height: 1;
+}
+
+textarea {
+    min-height: 60px;
 }
 
 /* ###################### Custom checkbox #########################*/
@@ -546,4 +550,26 @@ button p {
     width: 100% !important;
     height: inherit !important;
     margin: inherit;
+}
+
+.Einsatzstellen-Info-Wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    z-index: 999;
+}
+
+.Einsatzstellen-Info {
+    padding: 1%;
+    position: absolute;
+    top: 15%;
+    left: 15%;
+    width: 70%;
+    border: 2px solid #000000;
+    box-shadow: 0px 0px 10px 3px #000000;
+    background-color: #204d74;
+    text-align: center;
 }

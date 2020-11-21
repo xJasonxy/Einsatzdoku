@@ -32,6 +32,16 @@ class Einsatzstellen(models.Model):
         else:
             return self.Name + ", " + self.Ort.Langname
 
+    def get_all_info(self):
+        return Informationen.objects.filter(Einsatzstelle=self).order_by('Timestamp')
+
+    def get_latest_info(self):
+        try:
+            return self.get_all_info()[0]
+        except:
+            return None
+
+
 
 class Informationen(models.Model):
     Einsatzstelle = models.ForeignKey('Einsatzstellen', on_delete=models.PROTECT)

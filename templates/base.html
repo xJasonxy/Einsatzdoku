@@ -1,4 +1,5 @@
 {% load static %}
+{% autoescape on %}
 <html>
 <head>
 	<meta charset="UTF-8">
@@ -9,11 +10,6 @@
   	<script src="{%  static 'doku/jquery.min.js' %}"></script>
   	<script src="{%  static 'doku/bootstrap.min.js' %}"></script>
 	<script src="{%  static 'doku/popper.min.js' %}"></script>
-	<!--
-	<link rel="stylesheet" media="print" type="text/css" href="{% static 'doku/bootstrap.min.css' %}">
-	<script type="text/javascript" src="{% static 'doku/jquery-3.4.1.min.js' %}"></script>
-	<script type="text/javascript" src="{% static 'doku/bootstrap.min.js' %}"></script>
-	-->
 	<link rel="stylesheet" media="screen" type="text/css" href="{% static 'doku/style.css' %}">
 	<link rel="stylesheet" media="print" type="text/css" href="{% static 'doku/print.css' %}">
 </head>
@@ -96,3 +92,4 @@
 	{% endif %}
 </body>
 </html>
+{% endautoescape %}

@@ -5,10 +5,12 @@
         <div class="minimize-this do-not-print">
             <div class="spacer"></div>
             <div class="Toolbox">
+            {% if autor %}
                 {% if einstellungen.Lagekarten %}
                 <a target="_blank" href="{% url 'lagekarte:lagekarte' einsatz.Nummer %}"><button>Lagekarten</button></a>
                 {% endif %}
                 <a href="{% url 'oel:oel' einsatz.Nummer %}"><button>ÖEL</button></a>
+            {% endif %}
                 {% if einstellungen.Hydranten %}
                 <a target="_blank" href="{{ einstellungen.Hydranten }}"><button>Hydranten</button></a>
                 {%  endif %}

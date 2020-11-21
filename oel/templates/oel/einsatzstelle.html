@@ -1,0 +1,65 @@
+{% if status == "fertig" and not Einsatzstelle.Abgeschlossen %}
+{% elif status == "aktiv" and Einsatzstelle.Abgeschlossen %}
+{% elif not Einsatzstelle.Einheit %}
+{% else %}
+    {% if status == "fertig" %}
+        {% if Einsatzstelle.Abgeschlossen %}
+            <li onclick="showInfo('info-{{ Einsatzstelle.pk }}')" class="Einsatzstelle"
+                style="background-color: {{ Einsatzstelle.Ort.Farbe }};"
+                data-toggle="tooltip"
+                title="Gemeldet:<br>{{ Einsatzstelle.Gemeldet }}<hr>Übernommen:<br>{{ Einsatzstelle.Zugewiesen }}<hr>Abgeschlossen:<br>{{ Einsatzstelle.Abgeschlossen }}"
+                data-html="true"
+                data-placement="bottom">
+                {{ Einsatzstelle.Einheit }} @ {{ Einsatzstelle }}
+                {% if Einsatzstelle.Anmerkungen %}
+                    <p class="Anmerkung">{{ Einsatzstelle.Anmerkungen }}</p>{% endif %}
+            </li>
+        {% endif %}
+    {% elif status == "aktiv" %}
+        {% if not Einsatzstelle.Abgeschlossen %}
+            <li onclick="showInfo('info-{{ Einsatzstelle.pk }}')" id="einsatzstelle-{{ Einsatzstelle.pk }}"
+                class="Einsatzstelle" style="background-color: {{ Einsatzstelle.Ort.Farbe }};"
+                data-toggle="tooltip"
+                title="Gemeldet:<br>{{ Einsatzstelle.Gemeldet }}<br>Übernommen:<br>{{ Einsatzstelle.Zugewiesen }}"
+                data-html="true"
+                data-placement="bottom">
+                <div class="floating-button">
+                    <form name="Einsatzstelle_fertig"
+                          action="{% url 'oel:oel' einsatz.Nummer %}" method="post"
+                          autocomplete="off">
+                        {% csrf_token %}
+                        <input hidden class="do-not-show" name="Einsatzstelle"
+                               value="{{ Einsatzstelle.pk }}">
+                        <input hidden class="do-not-show" name="DONE" value="1"
+                               autocomplete="false">
+                        <input type="submit" class="check" value="erledigt">
+                    </form>
+                </div>
+                <div>
+                    {{ Einsatzstelle.Einheit }} @ {{ Einsatzstelle }}
+                    {% if Einsatzstelle.Anmerkungen %}
+                        <p class="Anmerkung">{{ Einsatzstelle.Anmerkungen }}</p>{% endif %}
+                </div>
+            </li>
+        {% endif %}
+    {% endif %}
+    <div class="Einsatzstellen-Info-Wrapper" id="info-{{ Einsatzstelle.pk }}">
+        <div class="Einsatzstellen-Info">
+            <h2>Infos zu {{ Einsatzstelle.Einheit }} @ {{ Einsatzstelle }}</h2>
+            <h3>{{ Einsatzstelle.Anmerkungen }}</h3>
+            <p>Gemeldet: {{ Einsatzstelle.Gemeldet }}</p>
+            <p>Übernommen: {{ Einsatzstelle.Zugewiesen }}</p>
+            <p>Abgeschlossen: {{ Einsatzstelle.Abgeschlossen }}</p>
+            <form>
+                <input type="number" class="Einsatzstellen-Info-Personal"
+                       value="{{ Einsatzstelle.get_latest_info.Personal }}"
+                       placeholder="Eingesetztes Personal">
+                <textarea class="Einsatzstellen-Info-Material"
+                          placeholder="Materialverbrauch">{{ Einsatzstelle.get_latest_info.Material }}</textarea>
+                <textarea class="Einsatzstellen-Info-Notizen"
+                          placeholder="Notizen">{{ Einsatzstelle.get_latest_info.Freitext }}</textarea>
+                <input type="submit" value="Speichern">
+            </form>
+        </div>
+    </div>
+{% endif %}

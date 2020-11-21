@@ -72,14 +72,20 @@ def oel_response(request, einsatz_id, error=None):
     return render(request, 'oel/oel.html', context)
 
 
-@require_POST()
-@login_required()
+@require_POST
+@login_required
 def neue_einheit(request, einsatz_id):
-    return oel(request, einsatz_id)
+    einsatz = get_object_or_404(Einsatz, pk=einsatz_id)
+    name = request.POST.get('Name', "")
+    if name == "":
+        raise Exception("Es muss ein Name eingegeben werden!")
+    einheit = Einheiten(Einsatz=einsatz, Name=name)
+    einheit.save()
+    return HttpResponseRedirect(reverse('oel:oel', args=[einsatz_id]))
 
 
-@require_POST()
-@login_required()
+@require_POST
+@login_required
 def neue_einsatzstelle(request, einsatz_id):
     ort_frei = None
     autor = request.user if request.user.is_authenticated else None
@@ -104,29 +110,30 @@ def neue_einsatzstelle(request, einsatz_id):
     return HttpResponseRedirect(reverse('oel:oel', args=[einsatz_id]))
 
 
-@require_POST()
-@login_required()
+@require_POST
+@login_required
 def einheit_zuweisen(request, einsatz_id, einsatzstelle):
     autor = request.user if request.user.is_authenticated else None
-    einheit = get_object_or_404(Einheiten, Name=request.POST['einheit'])
+    einheit = get_object_or_404(Einheiten, pk=request.POST['Einheit'])
     einsatz = get_object_or_404(Einsatz, pk=einsatz_id)
     e = get_object_or_404(Einsatzstellen, pk=einsatzstelle)
     e.Einheit = einheit
     e.Zugewiesen = datetime.datetime.now()
     e_ort = e.OrtFrei if e.OrtFrei else e.Ort.Langname
+    e.save()
     inhalt = "Einsatzstelle \"" + e.Name + ", " + e_ort + "\" übernommen von \"" + e.Einheit.Name + "\""
     m = Meldung(Inhalt=inhalt, Wichtig=False, Einsatz=einsatz, Autor=autor, Zug=None)
     m.save()
     return HttpResponseRedirect(reverse('oel:oel', args=[einsatz_id]))
 
 
-@require_POST()
-@login_required()
+@require_POST
+@login_required
 def einsatzstelle_erledigt(request, einsatz_id):
-    return oel_response(request, einsatz_id, error)
+    return HttpResponseRedirect(reverse('oel:oel', args=[einsatz_id]))
 
 
-@require_POST()
-@login_required()
+@require_POST
+@login_required
 def neue_information(request, einsatz_id):
-    return oel_response(request, einsatz_id, error)
+    return HttpResponseRedirect(reverse('oel:oel', args=[einsatz_id]))

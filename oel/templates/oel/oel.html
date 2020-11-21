@@ -2,174 +2,145 @@
 {% load static %}
 
 {% block content %}
-{% if einsatz %}
-<script>
-		document.title = `Einsatzdokumentation - #{% if einsatz.extNummer %}
+    {% if einsatz %}
+        <script>
+            document.title = `ÖEL zu Einsatz #{% if einsatz.extNummer %}
 		{{ einsatz.extNummer }}{% else %}{{einsatz.Nummer}}{% endif %} {{ einsatz.Stichwort.Kurzname }}
 		{% if einsatz.OrtFrei %}{{ einsatz.OrtFrei }}{% else %}{{ einsatz.Ort.Langname }}{% endif %}`;
 
-</script>
-<div class="Modul linkesModul">
-    <h2>Einheiten</h2>
-    <div class="minimize-button active">-</div>
-    <div class="minimize-this" style="display:block;">
-        <div class="spacer"></div>
-        {% if einheiten %}
-        <ul id="Einheitenliste">
-            {% for Einheit in einheiten %}
-            <li class="Einheit">
-                <div class="floating-button">{{ Einheit.getAnzahlEinsatzstellen }}</div>{{ Einheit }}
-            </li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-        {% if autor %}
-        <div class="Formular">
-            <form name="neue_Einheit" action="{% url 'oel:oel' einsatz.Nummer %}" method="post" autocomplete="off">
-                {% csrf_token %}
-                <input hidden class="do-not-show" autocomplete="false">
-                <input id="EinheitName" name="Name" placeholder="Name der Einheit" required/>
-                <input type="submit" class="check" value="Einheit anlegen">
-            </form>
-        </div>
-        {% endif %}
-    </div>
-</div>
-
-<!-- Abschnitt Meldungen -->
-<div class="Modul mittleresModul">
-    <h2>Einsätze in Arbeit</h2>
-    <div class="minimize-button active">-</div>
-    <div class="minimize-this" style="display:block;">
-        <div class="spacer"></div>
-        {% if einsatzstellen %}
-        <ul id="aktiv">
-            {% for Einsatzstelle in einsatzstellen %}
-            {% if Einsatzstelle.Einheit %}
-            {% if not Einsatzstelle.Abgeschlossen %}
-            <li class="Einsatzstelle" style="background-color: {{ Einsatzstelle.Ort.Farbe }};"
-                data-toggle="tooltip"
-                title="Gemeldet:<br>{{ Einsatzstelle.Gemeldet }}<br>Übernommen:<br>{{ Einsatzstelle.Zugewiesen }}"
-                data-html="true"
-                data-placement="bottom">
-                <div class="floating-button">
-                    <form name="Einsatzstelle_fertig" action="{% url 'oel:oel' einsatz.Nummer %}" method="post" autocomplete="off">
-                        {% csrf_token %}
-                        <input hidden class="do-not-show" name="Einsatzstelle" value="{{ Einsatzstelle.pk }}">
-                        <input hidden class="do-not-show" name="DONE" value="1" autocomplete="false">
-                        <input type="submit" class="check" value="erledigt">
-                    </form>
-                </div>
-                <div>
-                {{ Einsatzstelle.Einheit }} @ {{ Einsatzstelle }}
-                {% if Einsatzstelle.Anmerkungen %}<p class="Anmerkung">{{ Einsatzstelle.Anmerkungen }}</p>{% endif %}
-                </div>
-            </li>
-            {% endif %}
-            {% endif %}
-            {% endfor %}
-        </ul>
-        {% endif %}
-    </div>
-    <h2>abgeschlossene Einsätze</h2>
-    <div class="minimize-button active">-</div>
-    <div class="minimize-this" style="display:block;">
-        <div class="spacer"></div>
-        {% if einsatzstellen %}
-        <ul id="fertig">
-            {% for Einsatzstelle in einsatzstellen %}
-            {% if Einsatzstelle.Einheit %}
-            {% if Einsatzstelle.Abgeschlossen %}
-            <li class="Einsatzstelle" style="background-color: {{ Einsatzstelle.Ort.Farbe }};"
-                data-toggle="tooltip"
-                title="Gemeldet:<br>{{ Einsatzstelle.Gemeldet }}<hr>Übernommen:<br>{{ Einsatzstelle.Zugewiesen }}<hr>Abgeschlossen:<br>{{ Einsatzstelle.Abgeschlossen }}"
-                data-html="true"
-                data-placement="bottom">
-                {{ Einsatzstelle.Einheit }} @ {{ Einsatzstelle }}
-                {% if Einsatzstelle.Anmerkungen %}<p class="Anmerkung">{{ Einsatzstelle.Anmerkungen }}</p>{% endif %}
-            </li>
-            {% endif %}
-            {% endif %}
-            {% endfor %}
-        </ul>
-        {% endif %}
-    </div>
-</div>
-
-<div class="Modul rechtesModul">
-    <h2 class="do-not-print">offene Einsätze</h2>
-    <div class="minimize-button active">-</div>
-    <div class="minimize-this" style="display:block;">
-        <div class="spacer"></div>
-        {% if autor %}
-        <div class="Formular">
-            <form name="neue_Einsatzstelle"
-                  action="{% url 'oel:neue_einsatzstelle' einsatz.Nummer %}"
-                  method="post"
-                  autocomplete="off">
-                {% csrf_token %}
-                <input hidden class="do-not-show" autocomplete="false">
-                <input id="EStellenName" name="Name" placeholder="Adresse oder Name" required/>
-                <select class="Ort" name="Ort">
-                    <option value="" disabled selected>Ort</option>
-                    {% for Ort in alle_Orte %}
-                        <option value="{{ Ort.Kurzname }}">{{ Ort.Langname }}</option>
-                    {% endfor %}
-                </select>
-                <input hidden class="Freitext" name="Freitext" placeholder="Freitext Ort">
-                <input id="EStellenAnmerkungen" name="Anmerkungen" placeholder="Anmerkungen"/>
-                <input type="submit" class="check" value="Einsatzstelle hinzufügen">
-            </form>
-            <script>
-                $(".Freitext").hide();
-                $(".Ort").change(function() {
-                    if($(".Ort option:selected").text() == "Freitext") {
-                        $(".Freitext").show();
-                    } else {
-                        $(".Freitext").hide();
-                    }
-                });
-            </script>
-        </div>
-        {% endif %}
-        {% if einsatzstellen %}
-        <ul id="offen">
-            {% for Einsatzstelle in einsatzstellen %}
-            {% if not Einsatzstelle.Einheit %}
-            <li class="Einsatzstelle" style="background-color: {{ Einsatzstelle.Ort.Farbe }};"
-                data-toggle="tooltip" title="Gemeldet:<br>{{ Einsatzstelle.Gemeldet }}"
-                data-html="true"
-                data-placement="left">
-                {{ Einsatzstelle }}
-                <ul class="EinsatzstelleMenu noClick">
-                    {% if Einsatzstelle.Anmerkungen %}
-                    <li class="Anmerkung">{{ Einsatzstelle.Anmerkungen }}</li>
-                    {% endif %}
-                    <li>
-                        <form name="Einsatzuebernahme" action="{% url 'oel:oel' einsatz.Nummer %}" method="post" autocomplete="off">
+        </script>
+        <div class="Modul linkesModul">
+            <h2>Einheiten</h2>
+            <div class="minimize-button active">-</div>
+            <div class="minimize-this" style="display:block;">
+                <div class="spacer"></div>
+                {% if einheiten %}
+                    <ul id="Einheitenliste">
+                        {% for Einheit in einheiten %}
+                            <li class="Einheit">
+                                <div class="floating-button">{{ Einheit.getAnzahlEinsatzstellen }}</div>
+                                {{ Einheit }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% if autor %}
+                    <div class="Formular">
+                        <form name="neue_Einheit" action="{% url 'oel:neue_einheit' einsatz.Nummer %}" method="post"
+                              autocomplete="off">
                             {% csrf_token %}
-                            <input hidden class="do-not-show" name="Einsatzstelle" value="{{ Einsatzstelle.pk }}">
-                            <select class="Einheit" name="Einheit" required>
-                                <option value="" disabled selected>Einheit</option>
-                                {% for Einheit in einheiten %}
-                                <option value="{{ Einheit.pk }}">
-                                    {{ Einheit }} ({{ Einheit.getAnzahlEinsatzstellen }})
-                                </option>
+                            <input hidden class="do-not-show" autocomplete="false">
+                            <input id="EinheitName" name="Name" placeholder="Name der Einheit" required/>
+                            <input type="submit" class="check" value="Einheit anlegen">
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Abschnitt Meldungen -->
+        <div class="Modul mittleresModul">
+            <h2>Einsätze in Arbeit</h2>
+            <div class="minimize-button active">-</div>
+            <div class="minimize-this" style="display:block;">
+                <div class="spacer"></div>
+                {% if einsatzstellen %}
+                    <ul id="aktiv">
+                        {% for Einsatzstelle in einsatzstellen %}
+                            {%  include "oel/einsatzstelle.html" with status="aktiv" %}
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <h2>abgeschlossene Einsätze</h2>
+            <div class="minimize-button active">-</div>
+            <div class="minimize-this" style="display:block;">
+                <div class="spacer"></div>
+                {% if einsatzstellen %}
+                    <ul id="fertig">
+                        {% for Einsatzstelle in einsatzstellen %}
+                            {%  include "oel/einsatzstelle.html" with status="fertig" %}
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="Modul rechtesModul">
+            <h2 class="do-not-print">offene Einsätze</h2>
+            <div class="minimize-button active">-</div>
+            <div class="minimize-this" style="display:block;">
+                <div class="spacer"></div>
+                {% if autor %}
+                    <div class="Formular">
+                        <form name="neue_Einsatzstelle"
+                              action="{% url 'oel:neue_einsatzstelle' einsatz.Nummer %}"
+                              method="post"
+                              autocomplete="off">
+                            {% csrf_token %}
+                            <input hidden class="do-not-show" autocomplete="false">
+                            <input id="EStellenName" name="Name" placeholder="Adresse oder Name" required/>
+                            <select class="Ort" name="Ort">
+                                <option value="" disabled selected>Ort</option>
+                                {% for Ort in alle_Orte %}
+                                    <option value="{{ Ort.Kurzname }}">{{ Ort.Langname }}</option>
                                 {% endfor %}
                             </select>
-                            <input type="submit" class="check" value="Einsatz zuweisen">
+                            <input hidden class="Freitext" name="Freitext" placeholder="Freitext Ort">
+                            <input id="EStellenAnmerkungen" name="Anmerkungen" placeholder="Anmerkungen"/>
+                            <input type="submit" class="check" value="Einsatzstelle hinzufügen">
                         </form>
-                    </li>
-                </ul>
-            </li>
-            {% endif %}
-            {% endfor %}
-        </ul>
-        {% endif %}
-    </div>
-</div>
-{% else %}
-<h2>Kein Einsatz mit dieser Nummer vorhanden!</h2>
-{% endif %}
-<script type="text/javascript" src="{% static 'doku/einsatz.js' %}"></script>
+                        <script>
+                            $(".Freitext").hide();
+                            $(".Ort").change(function () {
+                                if ($(".Ort option:selected").text() == "Freitext") {
+                                    $(".Freitext").show();
+                                } else {
+                                    $(".Freitext").hide();
+                                }
+                            });
+                        </script>
+                    </div>
+                {% endif %}
+                {% if einsatzstellen %}
+                    <ul id="offen">
+                        {% for Einsatzstelle in einsatzstellen %}
+                            {% if not Einsatzstelle.Einheit %}
+                                <li class="Einsatzstelle" style="background-color: {{ Einsatzstelle.Ort.Farbe }};"
+                                    data-toggle="tooltip" title="Gemeldet:<br>{{ Einsatzstelle.Gemeldet }}"
+                                    data-html="true"
+                                    data-placement="left">
+                                    {{ Einsatzstelle }}
+                                    <ul class="EinsatzstelleMenu noClick">
+                                        {% if Einsatzstelle.Anmerkungen %}
+                                            <li class="Anmerkung">{{ Einsatzstelle.Anmerkungen }}</li>
+                                        {% endif %}
+                                        <li>
+                                            <form name="Einsatzuebernahme"
+                                                  action="{% url 'oel:einheit_zuweisen' einsatz.Nummer Einsatzstelle.id %}"
+                                                  method="post" autocomplete="off">
+                                                {% csrf_token %}
+                                                <select class="Einheit" name="Einheit" required>
+                                                    <option value="" disabled selected>Einheit</option>
+                                                    {% for Einheit in einheiten %}
+                                                        <option value="{{ Einheit.pk }}">
+                                                            {{ Einheit }} ({{ Einheit.getAnzahlEinsatzstellen }})
+                                                        </option>
+                                                    {% endfor %}
+                                                </select>
+                                                <input type="submit" class="check" value="Einsatz zuweisen">
+                                            </form>
+                                        </li>
+                                    </ul>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <h2>Kein Einsatz mit dieser Nummer vorhanden!</h2>
+    {% endif %}
+    <script type="text/javascript" src="{% static 'doku/oel.js' %}"></script>
 {% endblock %}
